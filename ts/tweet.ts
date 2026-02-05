@@ -10,21 +10,50 @@ class Tweet {
 	//returns either 'live_event', 'achievement', 'completed_event', or 'miscellaneous'
     get source():string {
         //TODO: identify whether the source is a live event, an achievement, a completed event, or miscellaneous.
-        return "unknown";
+        const lower = this.text.toLowerCase();
+
+		if (lower.startsWith("just completed")) {
+			return "completed_event";
+		}
+		if (lower.startsWith("i'm") || lower.startsWith("im ")) {
+			return "live_event";
+		}
+		if (lower.includes("achieved") || lower.includes("goal")) {
+			return "achievement";
+		}
+		return "miscellaneous";
     }
 
     //returns a boolean, whether the text includes any content written by the person tweeting.
     get written():boolean {
         //TODO: identify whether the tweet is written
-        return false;
+        if (this.source !== "completed_event") {
+			return false;
+		}
+
+		let cleaned = this.text;
+
+		// remove hashtag and link
+		cleaned = cleaned.replace("#RunKeeper", "");
+		cleaned = cleaned.replace(/https:\/\/t\.co\/\S+/, "");
+
+		// remove default RunKeeper sentence
+		cleaned = cleaned.replace(/Just completed a .* with RunKeeper\./i, "");
+
+		return cleaned.trim().length > 0;;
     }
 
     get writtenText():string {
-        if(!this.written) {
-            return "";
-        }
-        //TODO: parse the written text from the tweet
-        return "";
+        if (!this.written) {
+			return "";
+		}
+
+		let cleaned = this.text;
+		cleaned = cleaned.replace("#RunKeeper", "");
+		cleaned = cleaned.replace(/https:\/\/t\.co\/\S+/, "");
+		cleaned = cleaned.replace(/Just completed a .* with RunKeeper\./i, "");
+
+		return cleaned.trim();
     }
 
     get activityType():string {
@@ -32,7 +61,29 @@ class Tweet {
             return "unknown";
         }
         //TODO: parse the activity type from the text of the tweet
-        return "";
+        const lower = this.text.toLowerCase();
+
+		// find the distance unit
+		const miIndex = lower.indexOf(" mi ");
+		const kmIndex = lower.indexOf(" km ");
+
+		let start = -1;
+		if (miIndex !== -1) {
+			start = miIndex + 4;
+		} else if (kmIndex !== -1) {
+			start = kmIndex + 4;
+		}
+
+		if (start === -1) {
+			return "unknown";
+		}
+
+		const end = lower.indexOf(" with runkeeper");
+		if (end === -1) {
+			return "unknown";
+		}
+
+		return lower.substring(start, end).trim();
     }
 
     get distance():number {
@@ -40,11 +91,33 @@ class Tweet {
             return 0;
         }
         //TODO: prase the distance from the text of the tweet
-        return 0;
+        const lower = this.text.toLowerCase();
+
+		const miMatch = lower.match(/([\d.]+)\smi/);
+		if (miMatch) {
+			return parseFloat(miMatch[1]);
+		}
+
+		const kmMatch = lower.match(/([\d.]+)\skm/);
+		if (kmMatch) {
+			const km = parseFloat(kmMatch[1]);
+			return km / 1.609;
+		}
+
+		return 0;
     }
 
     getHTMLTableRow(rowNumber:number):string {
         //TODO: return a table row which summarizes the tweet with a clickable link to the RunKeeper activity
-        return "<tr></tr>";
+        const linkMatch = this.text.match(/https:\/\/t\.co\/\S+/);
+		const link = linkMatch ? linkMatch[0] : "#";
+
+		return `
+			<tr>
+				<td>${rowNumber}</td>
+				<td>${this.activityType}</td>
+				<td><a href="${link}" target="_blank">View</a></td>
+			</tr>
+		`;
     }
 }
