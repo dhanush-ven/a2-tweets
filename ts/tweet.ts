@@ -10,15 +10,17 @@ class Tweet {
 	//returns either 'live_event', 'achievement', 'completed_event', or 'miscellaneous'
     get source():string {
         //TODO: identify whether the source is a live event, an achievement, a completed event, or miscellaneous.
-        const lower = this.text.toLowerCase();
+        // const lower = this.text.toLowerCase();
+		const lower = this.text;
 
-		if (lower.startsWith("just completed")) {
+		if (lower.startsWith("Just completed")|| lower.startsWith("Completed") || lower.startsWith("Just posted") ) {
 			return "completed_event";
 		}
-		if (lower.startsWith("i'm") || lower.startsWith("im ")) {
+		// You wanna be careful with words that are like "I'm or some vague words"
+		if (lower.includes("#RKLive") ) {
 			return "live_event";
 		}
-		if (lower.includes("achieved") || lower.includes("goal")) {
+		if (lower.includes("Achieved")|| lower.includes("#FitnessAlerts")) {
 			return "achievement";
 		}
 		return "miscellaneous";
@@ -31,16 +33,18 @@ class Tweet {
 			return false;
 		}
 
-		let cleaned = this.text;
+		return !this.text.includes("with @Runkeeper");
 
-		// remove hashtag and link
-		cleaned = cleaned.replace("#RunKeeper", "");
-		cleaned = cleaned.replace(/https:\/\/t\.co\/\S+/, "");
+		// let cleaned = this.text;
 
-		// remove default RunKeeper sentence
-		cleaned = cleaned.replace(/Just completed a .* with RunKeeper\./i, "");
+		// // remove hashtag and link
+		// cleaned = cleaned.replace("#RunKeeper", "");
+		// cleaned = cleaned.replace(/https:\/\/t\.co\/\S+/, "");
 
-		return cleaned.trim().length > 0;;
+		// // remove default RunKeeper sentence
+		// cleaned = cleaned.replace(/Just completed a .* with RunKeeper\./i, "");
+
+		// return cleaned.trim().length > 0;;
     }
 
     get writtenText():string {

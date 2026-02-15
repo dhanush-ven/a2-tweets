@@ -13,6 +13,15 @@ function parseTweets(runkeeper_tweets) {
         const el = document.getElementById(id);
         if (el) el.innerText = text;
     }
+    
+    function setTextClass(className, text) {
+        const el = document.getElementsByClassName(className)[0];
+        if (el) el.innerText = text;
+    }
+    function setTextClasspt2(className, text) {
+        const el = document.getElementsByClassName(className)[1];
+        if (el) el.innerText = text;
+    }
 
     // Total tweets
     setText('numberTweets', tweet_array.length);
@@ -21,27 +30,53 @@ function parseTweets(runkeeper_tweets) {
        Earliest & Latest Dates
        ====================== */
     if (tweet_array.length > 0) {
-        const times = tweet_array.map(t => t.time.getTime()); // timestamps for min/max
+        const times = tweet_array.map(t => t.time); // timestamps for min/max
         const earliest = new Date(Math.min(...times));
-        const latest = new Date(Math.max(...times));
+        // const earliest = Math.min(...times)
+        console.log(typeof(earliest))
 
-        setText('earliestDate', earliest.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
-        setText('latestDate', latest.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+        const latest = new Date(Math.max(...times));
+        // const latest = Math.max(...times);
+        console.log(typeof(latest))
+
+        console.log(earliest.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }))
+        console.log(latest.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }))
+
+        setText('firstDate', earliest.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+        setText('lastDate', latest.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+        
     }
+
 
     /* ======================
        Tweet Categories
        ====================== */
     const total = tweet_array.length || 1; // prevent division by zero
+    console.log("total tweets: " + total)
+    setTextClass('numberTweets',total)
+    
     const completed = tweet_array.filter(t => t.source === 'completed_event').length;
+    console.log("total completed: " + completed)
+    setTextClass('completedEvents',completed)
+    setTextClasspt2('completedEvents',completed)
+    
     const live = tweet_array.filter(t => t.source === 'live_event').length;
+    console.log("total live tweets: " + live)
+    setTextClass('liveEvents',live)
+    
     const achievement = tweet_array.filter(t => t.source === 'achievement').length;
+    console.log("total achievement tweets: " + achievement)
+    setTextClass('achievements',achievement)
+    
     const misc = tweet_array.filter(t => t.source === 'miscellaneous').length;
+    console.log("total misc tweets: " + misc)
+    setTextClass('miscellaneous',misc)
 
-    setText('completedPercent', ((completed / total) * 100).toFixed(2));
-    setText('livePercent', ((live / total) * 100).toFixed(2));
-    setText('achievementPercent', ((achievement / total) * 100).toFixed(2));
-    setText('miscPercent', ((misc / total) * 100).toFixed(2));
+    setTextClass('completedEventsPct', ((completed / total) * 100).toFixed(2) + '%');
+    setTextClass('liveEventsPct', ((live / total) * 100).toFixed(2) + '%');
+    setTextClass('achievementsPct', ((achievement / total) * 100).toFixed(2) + '%');
+    setTextClass('miscellaneousPct', ((misc / total) * 100).toFixed(2) + '%');
+    // setTextClass('writtenPct',());
 
     /* ======================
        User-written Tweets
@@ -49,8 +84,10 @@ function parseTweets(runkeeper_tweets) {
     const completedTweets = tweet_array.filter(t => t.source === 'completed_event');
     if (completedTweets.length > 0) {
         const writtenCompleted = completedTweets.filter(t => t.written).length;
-        setText('writtenPercent', ((writtenCompleted / completedTweets.length) * 100).toFixed(2));
+        setTextClass('writtenPct', ((writtenCompleted / completedTweets.length) * 100).toFixed(2) + '%');
+        setTextClass('written', writtenCompleted);
     }
+    
 }
 
 // Wait for the DOM to load
