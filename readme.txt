@@ -16,7 +16,7 @@ ABout 6 hours
 
 
 4. What classmates or other individuals did you consult as part of this assignment? What did you discuss?
-- i did not consult any of my classmates
+- I Consulted my friend/classmate Peter Tumali be help me with mistakes that i made mainly revloving accesing elements from html into js. 
 
 
 5. Is there anything special we need to know in order to run your code?
